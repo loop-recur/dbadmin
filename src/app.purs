@@ -60,9 +60,11 @@ getSchema url cb = httpOptions url \text -> do
   cb text
   return unit
 
+makeInput :: String -> {} -> React.UI
 makeInput x = mkUI spec do
   return $ input [value x] []
 
+makeText :: String -> {} -> React.UI
 makeText x = mkUI spec do
   return $ textarea [value x] []
 
