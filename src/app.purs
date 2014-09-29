@@ -1,4 +1,3 @@
--- Taken from https://github.com/purescript-contrib/purescript-react/blob/9d93da3a6645be5059c3a499cc71817adfae207e/example/app/app.purs
 module Main where
 
 import Control.Monad.Eff
@@ -16,11 +15,9 @@ import qualified Data.Map as M
 
 newtype ColumnDetails = ColumnDetails { name::String, kind::String, maxLen:: Maybe Number, nullable::Boolean, position:: Number, updatable:: Boolean, schema:: String, precision:: Maybe Number }
 
-type Columns = (M.Map String ColumnDetails)
+newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
 
-newtype Schema = Schema {pkey :: [String], columns :: Columns}
-
-schema :: [String] -> Columns -> Schema
+schema :: [String] -> [ColumnDetails] -> Schema
 schema pkey columns = Schema {pkey:pkey, columns:columns}
 
 columnDetails :: String -> String -> Maybe Number -> Boolean -> Number -> Boolean -> String -> Maybe Number -> ColumnDetails
@@ -32,11 +29,6 @@ instance schemaFromJSON :: FromJSON Schema where
     columns <- (o .: "columns")
     Right $ schema pkey columns
   parseJSON x = Left "this ain't no schema"
-
-instance columnsFromJSON :: FromJSON (M.Map String ColumnDetails) where
-  parseJSON (Data.JSON.JObject obj) = M.fromList <$> traverse go (M.toList obj)
-    where
-      go (Tuple s r) = (Tuple s) <$> (parseJSON r)
 
 instance columnDetailsFromJSON :: FromJSON ColumnDetails where
   parseJSON (Data.JSON.JObject o) = do
@@ -68,9 +60,6 @@ getSchema url cb = httpOptions url \text -> do
   cb text
   return unit
 
-columnList :: Schema -> [ColumnDetails]
-columnList (Schema x) = snd <$> (M.toList x.columns)
-
 makeInput x = mkUI spec do
   return $ input [value x] []
 
@@ -78,13 +67,15 @@ makeText x = mkUI spec do
   return $ textarea [value x] []
 
 getComponent :: ColumnDetails -> React.UI
-getComponent (ColumnDetails cd) = case cd.kind of
-  "character varying" -> makeInput cd.name $ {}
-  "text" -> makeText cd.name $ {}
-  _ -> makeInput cd.name $ {}
+getComponent (ColumnDetails cd) = getCorrectComponent cd.name $ {}
+  where
+    getCorrectComponent = case cd.kind of
+      "character varying" -> makeInput
+      "text" -> makeText
+      _ -> makeInput
 
 renderComponents :: Schema -> React.UI
-renderComponents x = div' $ (getComponent <$> columnList x)
+renderComponents (Schema x) = div' $ (getComponent <$> x.columns)
 
 createUI :: forall eff. Maybe Schema -> Eff (dom :: React.DOM | eff) React.UI
 createUI = renderToBody <<< maybe (div' [text "no go"]) renderComponents
