@@ -1,4 +1,15 @@
-dpaui
-=====
+purescript-react-example
+========================
 
-Automatic ui's based on pg schema
+```
+$ npm install -g gulp
+$ npm install
+$ bower install
+$ gulp
+```
+
+and
+
+```
+$ open index.html
+```
