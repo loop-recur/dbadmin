@@ -22,6 +22,8 @@ var compile = function(options) {
     };
 };
 
+gulp.task('.psci', purescript.dotPsci)
+
 gulp.task('src', compile({}));
 
 gulp.task('watch', function() {
