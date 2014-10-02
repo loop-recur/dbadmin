@@ -59,9 +59,9 @@ foreign import serializeForm
   \ return function() { \
   \   var o = {}; \
   \   $(f).find(':input').map(function(i, x) {\
-  \     if(x.name){ o[x.name] = $(x).val(); } \
+  \     if(x.name && (x.name != 'id')){ o[x.name] = $(x).val(); } \
   \   }); \
-  \   return o; \
+  \   return JSON.stringify(o); \
   \  }\
   \}" :: DOMEventTarget -> forall eff. Eff eff {}
 

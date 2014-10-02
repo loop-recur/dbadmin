@@ -80,5 +80,5 @@ findAll = http "GET"
 getSchema :: forall r. String -> ContT Unit (EffJqAjax r) String
 getSchema = http "OPTIONS"
 
-save url body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body} res
+save url body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body, contentType: "application/json", processData: false} res
 
