@@ -8,6 +8,7 @@ import React.DOM
 import Data.Maybe
 import Control.Monad.Cont.Trans
 import Control.Monad.Trans
+import Control.Apply((<*))
 import Control.Bind
 import Data.Traversable
 import Data.Tuple
@@ -27,7 +28,6 @@ theForm columns = mkUI spec do
       className "dbform",
       onSubmit create
     ] ((input [typeProp "Submit"] []) : (getComponent <$> columns))
-
 
 makeInput :: String -> React.UI
 makeInput x = input [placeholder x, name x] []
@@ -65,13 +65,11 @@ foreign import serializeForm
   \  }\
   \}" :: DOMEventTarget -> forall eff. Eff eff {}
 
-
 create e = do
   f <- preventDefault e
   t <- getTarget f
   s <- serializeForm t
-  _ <- (httpPost "http://localhost:3000/speakers" s)
-  return unit
+  runContT (save "http://localhost:3000/speakers" s) (\y-> return unit)
 
 createForm :: Maybe Schema -> React.UI
 createForm = maybe (div' [text "no go"]) renderComponents
@@ -84,16 +82,19 @@ renderListHead (Row x) = tr' ((th' <<< pure <<< text) <$> M.keys x)
 renderListItem :: Row -> React.UI
 renderListItem (Row x) = tr' ((td' <<< pure <<< text) <$> M.values x)
 
-createList :: [Row] -> React.UI
-createList xs = theList ((getTheTopRow xs) : (renderComponents xs)) $ {}
+createTable :: [Row] -> React.UI
+createTable xs = theList ((getTheTopRow xs) : (renderComponents xs)) $ {}
   where
     getTheTopRow (x:xs) = renderListHead x
     renderComponents xs = renderListItem <$> xs
 
-megaButt :: Maybe [Row] -> React.UI
-megaButt = maybe (div' [text "no go"]) createList
+createList :: Maybe [Row] -> React.UI
+createList = maybe (div' [text "no go"]) createTable
 
 main = do
-  (httpGet "http://localhost:3000/speakers") {} (renderToElementById "list" <<< megaButt <<< decode) 
-  (httpOptions "http://localhost:3000/speakers") (renderToElementById "create" <<< createForm <<< decode) 
+  let listWidget = (createList <<< decode) <$> (findAll "http://localhost:3000/speakers") 
+  runContT listWidget $ \widget -> return unit <* (renderToElementById "list" widget)
+
+  let formWidget = (createForm <<< decode) <$> (getSchema "http://localhost:3000/speakers") 
+  runContT formWidget $ \y -> return unit <* (renderToElementById "create" y)
 

@@ -2,12 +2,10 @@ module Api where
 
 import Control.Monad.Eff
 import Debug.Trace
-import Network.XHR
 import Data.Maybe
 import Data.Either
-import Control.Monad.Cont.Trans
-import Control.Monad.Trans
 import Control.Bind
+import Control.Monad.Cont.Trans
 import Data.Traversable
 import Data.Tuple
 import Data.Array(head, map)
@@ -20,9 +18,6 @@ newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
 
 data Row = Row (M.Map String String)
 
-
--- row :: forall a. Tuple String a -> Row
--- row (Tuple String a) = Schema {pkey:pkey, columns:columns}
 
 schema :: [String] -> [ColumnDetails] -> Schema
 schema pkey columns = Schema {pkey:pkey, columns:columns}
@@ -50,6 +45,7 @@ instance columnDetailsFromJSON :: FromJSON ColumnDetails where
     Right $ columnDetails name kind maxLen nullable position updatable schma precision
   parseJSON x = Left "not a column"
 
+-- Not quite sure how to just make a FromJSON a => (Row a) so...
 instance rowFromJSON :: FromJSON Row where
     parseJSON (Data.JSON.JObject o) = (Row <<< M.fromList) <$> (sequence $ fn <$> M.toList o)
       where
@@ -59,30 +55,30 @@ instance rowFromJSON :: FromJSON Row where
         fn (Tuple k (Data.JSON.JBool v)) =  Right $ (Tuple k (show v))
     parseJSON x = Left "You wrong boyyeeee!"
 
-httpGet :: forall r eff. String -> {} -> (String -> EffAjax r eff) -> EffAjax r XHRTask
-httpGet path opts cb = get defaultAjaxOptions
-      { onReadyStateChange = onSuccess $ \response -> do
-          txt <- getResponseText response
-          cb txt
-          return unit
-      } path opts
+foreign import data JqAjax :: !
+type EffJqAjax r = Eff (jqajax :: JqAjax | r)
 
-httpOptions :: forall eff a. String -> (String -> (EffAjax eff a)) -> EffAjax eff XHRTask
-httpOptions path cb = ajax defaultAjaxOptions
-          { method = "OPTIONS",
-            url = path,
-            onReadyStateChange = onSuccess $ \response -> do
-              txt <- getResponseText response
-              cb txt
-              return unit
-          } {} noBody
+foreign import jqAjax
+  "function jqAjax(args) { \
+  \ args.dataType = 'text'; \
+  \ if(args.body) args.data = args.body; \
+  \ args.type = args.method || 'GET'; \
+  \ return function(cb) { \
+  \   args.success = function(r){ return cb(r)(); }; \
+  \   return function() { \
+  \     $.ajax(args); \
+  \    }\
+  \  }\
+  \}" :: forall a r eff. {|a} -> (String -> EffJqAjax r eff) -> (EffJqAjax r) Unit
 
-httpPost :: forall eff. String -> {} -> EffAjax (trace :: Trace | eff) XHRTask
-httpPost path body = ajax defaultAjaxOptions
-          { method = "POST",
-            url = path,
-            onReadyStateChange = onSuccess $ \response -> do
-              txt <- getResponseText response
-              trace txt
-          } {} (urlEncoded body)
+http :: forall r. String -> String -> ContT Unit (EffJqAjax r) String
+http method url = ContT $ \res -> jqAjax {method: method, url:url} res
+
+findAll :: forall r. String -> ContT Unit (EffJqAjax r) String
+findAll = http "GET"
+
+getSchema :: forall r. String -> ContT Unit (EffJqAjax r) String
+getSchema = http "OPTIONS"
+
+save url body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body} res
 
