@@ -1,5 +1,6 @@
 module Api where
 
+import Ajax
 import Control.Monad.Eff
 import Debug.Trace
 import Data.Maybe
@@ -8,7 +9,6 @@ import Control.Bind
 import Control.Monad.Cont.Trans
 import Data.Traversable
 import Data.Tuple
-import Data.Array(head, map)
 import Data.JSON((.:), (.:?), decode, FromJSON, parseJSON)
 import qualified Data.Map as M
 
@@ -17,7 +17,6 @@ newtype ColumnDetails = ColumnDetails { name::String, kind::String, maxLen:: May
 newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
 
 data Row = Row (M.Map String String)
-
 
 schema :: [String] -> [ColumnDetails] -> Schema
 schema pkey columns = Schema {pkey:pkey, columns:columns}
@@ -55,30 +54,12 @@ instance rowFromJSON :: FromJSON Row where
         fn (Tuple k (Data.JSON.JBool v)) =  Right $ (Tuple k (show v))
     parseJSON x = Left "You wrong boyyeeee!"
 
-foreign import data JqAjax :: !
-type EffJqAjax r = Eff (jqajax :: JqAjax | r)
-
-foreign import jqAjax
-  "function jqAjax(args) { \
-  \ args.dataType = 'text'; \
-  \ if(args.body) args.data = args.body; \
-  \ args.type = args.method || 'GET'; \
-  \ return function(cb) { \
-  \   args.success = function(r){ return cb(r)(); }; \
-  \   return function() { \
-  \     $.ajax(args); \
-  \    }\
-  \  }\
-  \}" :: forall a r eff. {|a} -> (String -> EffJqAjax r eff) -> (EffJqAjax r) Unit
-
 http :: forall r. String -> String -> ContT Unit (EffJqAjax r) String
 http method url = ContT $ \res -> jqAjax {method: method, url:url} res
 
-findAll :: forall r. String -> ContT Unit (EffJqAjax r) String
-findAll = http "GET"
+http' :: forall r. Tuple String String -> ContT Unit (EffJqAjax r) String
+http' (Tuple method url) = http method url
 
-getSchema :: forall r. String -> ContT Unit (EffJqAjax r) String
-getSchema = http "OPTIONS"
-
-save url body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body, contentType: "application/json", processData: false} res
+-- TODO make this just http'
+save' (Tuple method url) body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body, contentType: "application/json", processData: false} res
 
