@@ -67,7 +67,7 @@ create e = do
   _ <- preventDefault e
   rs <- getRefs
   t <- refsToObj rs
-  runContT (save "http://localhost:3000/speakers" t) (\y-> return unit)
+  runContT (save "https://localhost:3000/speakers" t) (\y-> return unit)
 
 createForm :: Maybe Schema -> React.UI
 createForm = maybe (div' [text "no go"]) renderComponents
@@ -90,9 +90,9 @@ createList :: Maybe [Row] -> React.UI
 createList = maybe (div' [text "no go"]) createTable
 
 main = do
-  let listWidget = (createList <<< decode) <$> (findAll "http://localhost:3000/speakers") 
+  let listWidget = (createList <<< decode) <$> (findAll "https://localhost:3000/speakers") 
   runContT listWidget $ \widget -> return unit <* (renderToElementById "list" widget)
 
-  let formWidget = (createForm <<< decode) <$> (getSchema "http://localhost:3000/speakers") 
+  let formWidget = (createForm <<< decode) <$> (getSchema "https://localhost:3000/speakers") 
   runContT formWidget $ \y -> return unit <* (renderToElementById "create" y)
 
