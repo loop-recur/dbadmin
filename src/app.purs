@@ -6,8 +6,7 @@ import Debug.Trace
 import React
 import React.DOM
 import Data.Maybe
-import Control.Monad.Cont.Trans
-import Control.Monad.Trans
+import Control.Monad.Cont.Trans(runContT)
 import Control.Apply((<*))
 import Control.Bind
 import Data.Traversable
@@ -23,17 +22,24 @@ theList trs = mkUI spec do
     ] trs
 
 theForm :: [ColumnDetails] -> {} -> React.UI
-theForm columns = mkUI spec do
+theForm columns = mkUI spec {
+    getInitialState = return {}
+  } do
+    state <- readState
+    pure $ div [ className "formbox" ] [ commentForm { columns: columns} ]
+
+commentForm = mkUI spec do
+  props <- getProps
   return $ form [
       className "dbform",
       onSubmit create
-    ] ((input [typeProp "Submit"] []) : (getComponent <$> columns))
+    ] ((input [typeProp "Submit"] []) : (getComponent <$> props.columns))
 
 makeInput :: String -> React.UI
-makeInput x = input [placeholder x, name x] []
+makeInput x = input [typeProp "text", placeholder x, name x, ref x] []
 
 makeText :: String -> React.UI
-makeText x = textarea [placeholder x, name x] []
+makeText x = textarea [placeholder x, name x, ref x] []
 
 getComponent :: ColumnDetails -> React.UI
 getComponent (ColumnDetails cd) = getCorrectComponent cd.name 
@@ -49,27 +55,19 @@ foreign import preventDefault
   \  return function(){ return e; } \
   \}" :: Event -> forall eff. Eff eff Event
 
-foreign import getTarget
-  "function getTarget(e) {\
-  \  return function(){ return e.target; } \
-  \}" :: Event -> forall eff. Eff eff DOMEventTarget
-
-foreign import serializeForm
-  "function serializeForm(f) { \
+--this should be done in ps
+foreign import refsToObj
+  "function refsToObj(xs) { \
   \ return function() { \
-  \   var o = {}; \
-  \   $(f).find(':input').map(function(i, x) {\
-  \     if(x.name && (x.name != 'id')){ o[x.name] = $(x).val(); } \
-  \   }); \
-  \   return JSON.stringify(o); \
+  \   return JSON.stringify(Object.keys(xs).reduce(function(acc, x){ acc[x] = xs[x].state.value; return acc;}, {})); \
   \  }\
-  \}" :: DOMEventTarget -> forall eff. Eff eff {}
+  \}" ::forall eff. {} -> Eff eff {}
 
 create e = do
-  f <- preventDefault e
-  t <- getTarget f
-  s <- serializeForm t
-  runContT (save "http://localhost:3000/speakers" s) (\y-> return unit)
+  _ <- preventDefault e
+  rs <- getRefs
+  t <- refsToObj rs
+  runContT (save "http://localhost:3000/speakers" t) (\y-> return unit)
 
 createForm :: Maybe Schema -> React.UI
 createForm = maybe (div' [text "no go"]) renderComponents

@@ -13,7 +13,6 @@
     "purescript-react": "https://github.com/purescript-contrib/purescript-react.git",
     "react": "~0.10.0",
     "purescript-arrays": "~0.2.1",
-    "purescript-xhr": "~0.2.0",
     "purescript-foreign": "~0.2.0",
     "purescript-either": "~0.1.3",
     "purescript-tuples": "~0.2.1",
