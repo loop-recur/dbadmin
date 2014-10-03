@@ -15,6 +15,8 @@ import Data.Array(head, elemIndex, filter)
 import Data.JSON(decode, FromJSON)
 import qualified Data.Map as M
 
+type StringifiedJSON = String
+
 theList :: [React.UI] -> {} -> React.UI
 theList trs = mkUI spec do
   return $ table [
@@ -58,16 +60,13 @@ foreign import preventDefault
 --this should be done in ps
 foreign import refsToObj
   "function refsToObj(xs) { \
-  \ return function() { \
   \   return JSON.stringify(Object.keys(xs).reduce(function(acc, x){ acc[x] = xs[x].state.value; return acc;}, {})); \
-  \  }\
-  \}" ::forall eff. {} -> Eff eff {}
+  \}" :: {} -> StringifiedJSON
 
 create e = do
   _ <- preventDefault e
   rs <- getRefs
-  t <- refsToObj rs
-  runContT (save "https://localhost:3000/speakers" t) (\y-> return unit)
+  runContT (save "https://localhost:3000/speakers" (refsToObj rs)) (\y-> return unit)
 
 
 columnsThatArentPrimaryKeys :: [String] -> [ColumnDetails] -> [ColumnDetails]
