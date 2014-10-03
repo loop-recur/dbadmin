@@ -11,7 +11,7 @@ import Control.Apply((<*))
 import Control.Bind
 import Data.Traversable
 import Data.Tuple
-import Data.Array(head)
+import Data.Array(head, elemIndex, filter)
 import Data.JSON(decode, FromJSON)
 import qualified Data.Map as M
 
@@ -69,10 +69,16 @@ create e = do
   t <- refsToObj rs
   runContT (save "https://localhost:3000/speakers" t) (\y-> return unit)
 
-createForm :: Maybe Schema -> React.UI
-createForm = maybe (div' [text "no go"]) renderComponents
+
+columnsThatArentPrimaryKeys :: [String] -> [ColumnDetails] -> [ColumnDetails]
+columnsThatArentPrimaryKeys pkeys columns = filter notAPkey columns
   where
-    renderComponents (Schema x) = theForm x.columns {}
+    notAPkey (ColumnDetails c) = c.name `elemIndex` pkeys < 0
+
+createForm :: Maybe Schema -> React.UI
+createForm = maybe (div' [text "Couldn't create form"]) renderComponents
+  where
+    renderComponents (Schema x) = theForm (columnsThatArentPrimaryKeys x.pkey x.columns) {}
 
 renderListHead:: Row -> React.UI
 renderListHead (Row x) = tr' ((th' <<< pure <<< text) <$> M.keys x)
@@ -87,12 +93,12 @@ createTable xs = theList ((getTheTopRow xs) : (renderComponents xs)) $ {}
     renderComponents xs = renderListItem <$> xs
 
 createList :: Maybe [Row] -> React.UI
-createList = maybe (div' [text "no go"]) createTable
+createList = maybe (div' [text "Couldn't create list"]) createTable
 
 main = do
-  let listWidget = (createList <<< decode) <$> (findAll "https://localhost:3000/speakers") 
-  runContT listWidget $ \widget -> return unit <* (renderToElementById "list" widget)
-
   let formWidget = (createForm <<< decode) <$> (getSchema "https://localhost:3000/speakers") 
   runContT formWidget $ \y -> return unit <* (renderToElementById "create" y)
+
+  let listWidget = (createList <<< decode) <$> (findAll "https://localhost:3000/speakers") 
+  runContT listWidget $ \widget -> return unit <* (renderToElementById "list" widget)
 
