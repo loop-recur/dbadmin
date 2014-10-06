@@ -7,18 +7,12 @@ import Control.Apply((<*))
 import Data.Maybe(maybe)
 import qualified Data.Map as M
 
-makeImage row = "<img src="++(avatar row)++"/>"
-  where
-    avatar r = maybe "" id (M.lookup "avatar" r)
+runWidget id' w = do
+  runContT w $ \y -> return unit <* (renderToElementById id' y) 
 
-main = do
-  let baseUrl = "https://localhost:3000/"
-  let form = formWidget baseUrl "speakers"
-  let speakerlist = listWidget baseUrl "speakers"
-  let sessionlist = listWidget baseUrl "sessions"
-  let customlist = customWidget baseUrl "speakers" makeImage
+custom config id' f = do
+  runWidget id' $ customWidget config.host config.table f
 
-  runContT form $ \y -> return unit <* (renderToElementById "create" y) 
-  runContT speakerlist $ \y -> return unit <* (renderToElementById "speakers" y) 
-  runContT sessionlist $ \y -> return unit <* (renderToElementById "sessions" y) 
-  runContT customlist $ \y -> return unit <* (renderToElementById "custom" y) 
+list config id' = do
+  runWidget id' $ listWidget config.host config.table
+

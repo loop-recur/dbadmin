@@ -84,11 +84,11 @@ createTable xs = theList ((getTheTopRow xs) : (renderComponents xs)) $ {}
 createList :: Maybe [Row] -> React.UI
 createList = maybe (div' [text "Couldn't create list"]) createTable
 
-createCustom :: forall a. ((M.Map String String) -> String) -> Maybe [Row] -> React.UI
+createCustom :: forall a. ({|a} -> String) -> Maybe [Row] -> React.UI
 createCustom f mr = maybe (div' [text "Couldn't create custom"]) (renderComponents f) mr
   where
     renderComponents f xs = theCustom ((go f) <$> xs) {}
-    go f (Row x) = rawUI<<<f $ x
+    go f (Row x) = rawUI<<<f $ toRecord $ M.toList x
 
 -- Let's get READER up in here.
 createUrls :: String -> String -> URLS
@@ -112,6 +112,12 @@ foreign import rawUI
   "function rawUI(str) { \
   \ return window.React.DOM.div({dangerouslySetInnerHTML: {__html: str}}); \
   \ }" :: String -> React.UI
+
+--this should be done in ps
+foreign import toRecord
+  "function toRecord(tuples) { \
+  \ return tuples.reduce(function(acc, x){ acc[x.value0]=x.value1; return acc; }, {}); \
+    \ }" :: forall a. [Tuple String String] -> {|a}
 
 foreign import preventDefault
   "function preventDefault(e) {\
