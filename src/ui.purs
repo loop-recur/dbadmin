@@ -15,6 +15,12 @@ import Data.Array(elemIndex, filter)
 import Data.JSON(decode)
 import qualified Data.Map as M
 
+theCustom :: [React.UI] -> {} -> React.UI
+theCustom subviews = mkUI spec do
+  return $ div [
+      className "custom"
+    ] subviews
+
 theList :: [React.UI] -> {} -> React.UI
 theList trs = mkUI spec do
   return $ table [
@@ -78,7 +84,13 @@ createTable xs = theList ((getTheTopRow xs) : (renderComponents xs)) $ {}
 createList :: Maybe [Row] -> React.UI
 createList = maybe (div' [text "Couldn't create list"]) createTable
 
--- Let's get READER!
+createCustom :: forall a. ((M.Map String String) -> String) -> Maybe [Row] -> React.UI
+createCustom f mr = maybe (div' [text "Couldn't create custom"]) (renderComponents f) mr
+  where
+    renderComponents f xs = theCustom ((go f) <$> xs) {}
+    go f (Row x) = rawUI<<<f $ x
+
+-- Let's get READER up in here.
 createUrls :: String -> String -> URLS
 createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url)}
   where
@@ -91,6 +103,15 @@ formWidget baseUrl tablename = ((createForm urls) <<< decode) <$> (http' urls.sc
 listWidget baseUrl tablename = (createList <<< decode) <$> (http' urls.index) 
   where
     urls = createUrls baseUrl tablename
+
+customWidget baseUrl tablename f = ((createCustom f) <<< decode) <$> (http' urls.index) 
+  where
+    urls = createUrls baseUrl tablename
+
+foreign import rawUI
+  "function rawUI(str) { \
+  \ return window.React.DOM.div({dangerouslySetInnerHTML: {__html: str}}); \
+  \ }" :: String -> React.UI
 
 foreign import preventDefault
   "function preventDefault(e) {\
