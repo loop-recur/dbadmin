@@ -10,7 +10,7 @@ foreign import jqAjax
   \ args.dataType = 'text'; \
   \ if(args.body) args.data = args.body; \
   \ args.type = args.method || 'GET'; \
-  \ args.xhrFields = {withCredentials: true} \
+  \ args.xhrFields = {withCredentials: true}; \
   \ return function(cb) { \
   \   args.success = function(r){ return cb(r)(); }; \
   \   return function() { \
