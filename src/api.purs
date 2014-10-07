@@ -1,6 +1,7 @@
 module Api where
 
 import Ajax
+import Types
 import Control.Monad.Eff
 import Debug.Trace
 import Data.Maybe
@@ -9,14 +10,14 @@ import Control.Bind
 import Control.Monad.Cont.Trans
 import Data.Traversable
 import Data.Tuple
-import Data.JSON((.:), (.:?), decode, FromJSON, parseJSON)
+import Data.JSON
 import qualified Data.Map as M
 
 newtype ColumnDetails = ColumnDetails { name::String, kind::String, maxLen:: Maybe Number, nullable::Boolean, position:: Number, updatable:: Boolean, schema:: String, precision:: Maybe Number }
 
 newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
 
-data Row = Row (M.Map String String)
+data Row = Row (M.Map String JValue)
 
 schema :: [String] -> [ColumnDetails] -> Schema
 schema pkey columns = Schema {pkey:pkey, columns:columns}
@@ -44,15 +45,11 @@ instance columnDetailsFromJSON :: FromJSON ColumnDetails where
     Right $ columnDetails name kind maxLen nullable position updatable schma precision
   parseJSON x = Left "not a column"
 
--- Not quite sure how to just make a FromJSON a => (Row a) so...
 instance rowFromJSON :: FromJSON Row where
-    parseJSON (Data.JSON.JObject o) = (Row <<< M.fromList) <$> (sequence $ fn <$> M.toList o)
+    parseJSON (JObject o) = (Row <<< M.fromList) <$> (sequence $ fn <$> M.toList o)
       where
-        fn (Tuple k (Data.JSON.JString v)) =  Right $ (Tuple k (show v))
-        fn (Tuple k (Data.JSON.JNumber v)) =  Right $ (Tuple k (show v))
-        fn (Tuple k (Data.JSON.JNull)) =  Right $ (Tuple k "")
-        fn (Tuple k (Data.JSON.JBool v)) =  Right $ (Tuple k (show v))
-    parseJSON x = Left "You wrong boyyeeee!"
+        fn t =  Right t
+    parseJSON x = Left "Uncaught js value"
 
 http :: forall r. String -> String -> ContT Unit (EffJqAjax r) String
 http method url = ContT $ \res -> jqAjax {method: method, url:url} res
@@ -63,3 +60,8 @@ http' (Tuple method url) = http method url
 -- TODO make this just http'
 save' (Tuple method url) body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body, contentType: "application/json", processData: false} res
 
+-- Let's get READER up in here.
+createUrls :: String -> String -> URLS
+createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url)}
+  where
+    url = baseurl++tablename

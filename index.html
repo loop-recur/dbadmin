@@ -9,9 +9,9 @@
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="js/dbadmin.js"></script>
     <script>
-      PS.Main.custom({host: 'https://localhost:3000/', table: 'speakers'})('custom_')(function(x){
-        var n = (x.firstname + ' ' + x.lastname).replace(/"/g, '');
-        return '<div class="speaker">'+'<img class="speakerImg" src='+x.avatar+'/>'+'<h5 class="speakerName">'+n+'</h5></div>'
+      PS.UI.custom({host: 'https://localhost:3000/', table: 'speakers'})('custom_')(function(x){
+        var n = (x.firstname + ' ' + x.lastname);
+        return '<div class="speaker">'+'<img class="speakerImg" src="'+x.avatar+'"/>'+'<h5 class="speakerName">'+n+'</h5></div>'
       })();
     </script>
 
