@@ -4,6 +4,7 @@ import React(renderToElementById)
 import qualified Form as F
 import qualified List as L
 import qualified Custom as C
+import qualified Login as Lg
 import Control.Monad.Cont.Trans(runContT)
 import Control.Apply((<*))
 import Data.Maybe(maybe)
@@ -20,4 +21,7 @@ list config id' = do
 
 form config id' = do
   runWidget id' $ F.widget config.host config.table
+
+login id' = do
+  renderToElementById id' $ Lg.widget {}
 

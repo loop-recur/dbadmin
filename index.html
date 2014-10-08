@@ -8,14 +8,16 @@
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="js/ui.js"></script>
-    <script>
-      PS.UI.form({host: 'https://localhost:3000/', table: 'speakers'})('create')();
-      PS.UI.list({host: 'https://localhost:3000/', table: 'speakers'})('speakers')();
-    </script>
-
+    <div id="login"></div>
     <div id="create"></div>
     <div id="speakers"></div>
     <div id="sessions"></div>
     <div id="custom_"></div>
+
+    <script>
+      PS.UI.form({host: 'https://localhost:3000/', table: 'speakers'})('create')();
+      PS.UI.list({host: 'https://localhost:3000/', table: 'speakers'})('speakers')();
+      PS.UI.login('login')();
+    </script>
   </body>
 </html>

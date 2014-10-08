@@ -1,6 +1,7 @@
 module List where
 
 import Api
+import Helper
 import Types
 import React
 import React.DOM
@@ -18,7 +19,7 @@ renderListHead:: Row -> React.UI
 renderListHead (Row x) = tr' ((th' <<< pure <<< text) <$> M.keys x)
 
 renderListItem :: Row -> React.UI
-renderListItem (Row x) = tr' ((td' <<< pure <<< text <<< show) <$> M.values x)
+renderListItem (Row x) = tr' ((td' <<< pure <<< text) <$> (M.values $ unpackedJValueMap x))
 
 createTable :: [Row] -> React.UI
 createTable xs = theList ((getTheTopRow xs) : (renderComponents xs)) $ {}
