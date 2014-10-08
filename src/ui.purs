@@ -5,6 +5,7 @@ import qualified Form as F
 import qualified List as L
 import qualified Custom as C
 import qualified Login as Lg
+import qualified Nav as Nav
 import Control.Monad.Cont.Trans(runContT)
 import Control.Apply((<*))
 import Data.Maybe(maybe)
@@ -25,3 +26,5 @@ form config id' = do
 login id' = do
   renderToElementById id' $ Lg.widget {}
 
+nav config id' = do
+  runWidget id' $ Nav.widget config.host

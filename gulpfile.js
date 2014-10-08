@@ -11,7 +11,7 @@ var compile = function(options) {
         // We need this hack for now until gulp does something about
         // https://github.com/gulpjs/gulp/issues/71
         //var psc = purescript.psc();
-        var psc = purescript.psc({main: false, output: 'ui.js'});
+        var psc = purescript.psc({main: true, output: 'app.js'});
         psc.on('error', function(e) {
             console.error(e.message);
             psc.end();

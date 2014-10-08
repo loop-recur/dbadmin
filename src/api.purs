@@ -17,6 +17,9 @@ newtype ColumnDetails = ColumnDetails { name::String, kind::String, maxLen:: May
 
 newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
 
+newtype Table = Table {schema :: String, name :: String, insertable :: Boolean}
+type DB = [Table]
+
 data Row = Row (M.Map String JValue)
 
 schema :: [String] -> [ColumnDetails] -> Schema
@@ -24,6 +27,14 @@ schema pkey columns = Schema {pkey:pkey, columns:columns}
 
 columnDetails :: String -> String -> Maybe Number -> Boolean -> Number -> Boolean -> String -> Maybe Number -> ColumnDetails
 columnDetails name kind maxLen nullable position updatable schma precision = ColumnDetails {name:name, kind:kind, maxLen:maxLen, nullable:nullable, position: position, updatable: updatable, schema: schma, precision: precision}
+
+instance tableFromJSON :: FromJSON Table where
+  parseJSON (Data.JSON.JObject o) = do
+    schema <- (o .: "schema")
+    name <- (o .: "name")
+    insertable <- (o .: "insertable")
+    Right $ Table {schema: schema, name: name, insertable: insertable}
+  parseJSON x = Left "not a db"
 
 instance schemaFromJSON :: FromJSON Schema where
   parseJSON (Data.JSON.JObject o) = do
@@ -62,6 +73,6 @@ save' (Tuple method url) body = ContT $ \res -> jqAjax {method: "POST", url:url,
 
 -- Let's get READER up in here.
 createUrls :: String -> String -> URLS
-createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url)}
+createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url), nav: (Tuple "GET" baseurl)}
   where
     url = baseurl++tablename

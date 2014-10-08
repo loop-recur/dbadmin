@@ -24,7 +24,7 @@ login e = do
 makeForm _ = form [
           className "login",
           onSubmit login
-        ] ((input [typeProp "Submit"] []) : [(makeInput "username" "text"), (makeInput "password" "password")])
+        ] ((input [typeProp "Login"] []) : [(makeInput "username" "text"), (makeInput "password" "password")])
 
 makeLink _ =  a [onClick logout] [text "Logout"]
 
