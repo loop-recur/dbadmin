@@ -7,12 +7,10 @@
   <body>
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="js/dbadmin.js"></script>
+    <script src="js/ui.js"></script>
     <script>
-      PS.UI.custom({host: 'https://localhost:3000/', table: 'speakers'})('custom_')(function(x){
-        var n = (x.firstname + ' ' + x.lastname);
-        return '<div class="speaker">'+'<img class="speakerImg" src="'+x.avatar+'"/>'+'<h5 class="speakerName">'+n+'</h5></div>'
-      })();
+      PS.UI.form({host: 'https://localhost:3000/', table: 'speakers'})('create')();
+      PS.UI.list({host: 'https://localhost:3000/', table: 'speakers'})('speakers')();
     </script>
 
     <div id="create"></div>

@@ -18,6 +18,6 @@ custom config id' f = do
 list config id' = do
   runWidget id' $ L.widget config.host config.table
 
-form config id' f = do
+form config id' = do
   runWidget id' $ F.widget config.host config.table
 
