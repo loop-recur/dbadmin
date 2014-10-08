@@ -12,7 +12,7 @@ import qualified Data.Map as M
 theList :: [React.UI] -> {} -> React.UI
 theList trs = mkUI spec do
   return $ table [
-      className "list"
+      className "list table table-bordered table-striped"
     ] trs
 
 renderListHead:: Row -> React.UI

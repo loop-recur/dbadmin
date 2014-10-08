@@ -1,18 +1,41 @@
 <!doctype>
 <html>
   <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <style>
+      #container {
+        width: 960px;
+        max-width: 960px;
+        background: #efefef;
+        margin: auto;
+        height: 100%;
+        min-height: 100%;
+        padding: 15px;
+      }
+      html, body {
+        height: 100%;
+        min-height: 100%;
+      }
+      div {
+        margin: 10px 0;
+      }
+      input {
+        margin: 5px 0;
+      }
     </style>
   </head>
   <body>
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <div id="nav"></div>
-    <div id="login"></div>
-    <div id="create"></div>
-    <div id="speakers"></div>
-    <div id="sessions"></div>
-    <div id="custom_"></div>
+
+    <div id="container">
+      <nav id="nav" class="navbar navbar-default" role="navigation"></nav>
+      <div id="login" class="col-xs-2 pull-right row"></div>
+      <div id="create" class="col-xs-12 row"></div>
+      <div id="speakers"></div>
+      <div id="sessions"></div>
+      <div id="custom_"></div>
+    </div>
 
     <script src="js/app.js"></script>
   </body>

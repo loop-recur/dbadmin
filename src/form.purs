@@ -26,10 +26,10 @@ commentForm = mkUI spec do
   return $ form [
       className "dbform",
       onSubmit props.create
-    ] ((input [typeProp "Submit"] []) : (getComponent <$> props.columns))
+    ] ((getComponent <$> props.columns) ++ [input [className "btn btn-primary pull-right", typeProp "Submit"] []])
 
 makeInput :: String -> React.UI
-makeInput x = input [typeProp "text", placeholder x, name x, ref x] []
+makeInput x = input [className "form-control", typeProp "text", placeholder x, name x, ref x] []
 
 makeText :: String -> React.UI
 makeText x = textarea [placeholder x, name x, ref x] []
