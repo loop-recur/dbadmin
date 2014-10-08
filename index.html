@@ -7,17 +7,20 @@
   <body>
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="js/dbadmin.js"></script>
-    <script>
-      PS.UI.custom({host: 'https://localhost:3000/', table: 'speakers'})('custom_')(function(x){
-        var n = (x.firstname + ' ' + x.lastname);
-        return '<div class="speaker">'+'<img class="speakerImg" src="'+x.avatar+'"/>'+'<h5 class="speakerName">'+n+'</h5></div>'
-      })();
-    </script>
+    <script src="js/ui.js"></script>
 
     <div id="create"></div>
     <div id="speakers"></div>
     <div id="sessions"></div>
     <div id="custom_"></div>
+
+    <script>
+      PS.UI.list({host: 'https://localhost:3000/', table: 'speakers'})('speakers')();
+      PS.UI.custom({host: 'https://localhost:3000/', table: 'speakers'})('custom_')(function(x){
+        var n = (x.first_name + ' ' + x.last_name);
+        return '<div class="speaker">'+'<img class="speakerImg" src="'+x.avatar+'"/>'+'<h5 class="speakerName">'+n+'</h5></div>'
+      })();
+      PS.UI.login('create')();
+    </script>
   </body>
 </html>

@@ -2,6 +2,7 @@ module Form where
 
 import Api
 import Types
+import Helper
 import Control.Monad.Eff
 import React
 import React.DOM
@@ -58,16 +59,3 @@ widget baseUrl tablename = ((createForm urls) <<< decode) <$> (http' urls.schema
 create urls e = do
   rs <- refsToObj <$> getRefs <* (preventDefault e)
   runContT (save' urls.create rs) (\y-> return unit)
-
-foreign import preventDefault
-  "function preventDefault(e) {\
-  \  e.preventDefault(); \
-  \  return function(){ return e; } \
-  \}" :: Event -> forall eff. Eff eff Event
-
---this should be done in ps
-foreign import refsToObj
-  "function refsToObj(xs) { \
-  \   return JSON.stringify(Object.keys(xs).reduce(function(acc, x){ acc[x] = xs[x].state.value; return acc;}, {})); \
-  \}" :: {} -> StringifiedJSON
-
