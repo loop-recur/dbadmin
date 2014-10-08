@@ -24,9 +24,9 @@ login e = do
 makeForm _ = form [
           className "login",
           onSubmit login
-        ] ((input [typeProp "Login"] []) : [(makeInput "username" "text"), (makeInput "password" "password")])
+        ] ((input [typeProp "Submit", value "Login", readOnly "true"] []) : [(makeInput "username" "text"), (makeInput "password" "password")])
 
-makeLink _ =  a [onClick logout] [text "Logout"]
+makeLink _ = a [onClick logout] [text "Logout"]
 
 widget = mkUI spec {
     getInitialState = return {logged_in: false},
