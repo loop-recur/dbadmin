@@ -10,7 +10,7 @@ import Data.Maybe
 import Control.Apply((<*))
 
 makeInput :: String -> String -> React.UI
-makeInput x p = div [className "pull-right"] [input [className "form-control", typeProp p, placeholder x, name x, ref x] []]
+makeInput x p = div [className "pull-left"] [input [className "form-control", typeProp p, placeholder x, name x, ref x] []]
 
 logout _ = do
   toLocalStorage "creds" ""
@@ -24,7 +24,7 @@ login e = do
 makeForm _ = form [
           className "login",
           onSubmit login
-        ] [input [className "btn btn-primary pull-right", typeProp "Submit", value "Login", readOnly "true"] [], (makeInput "password" "password"), (makeInput "username" "text")]
+        ] [(makeInput "username" "text"), (makeInput "password" "password"), input [className "btn btn-primary pull-left", typeProp "Submit", value "Login", readOnly "true"] []]
 
 makeLink _ = a [className "btn btn-danger pull-right logout", onClick logout, href "#"] [text "Logout"]
 
