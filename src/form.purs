@@ -13,6 +13,7 @@ import Data.Tuple
 import Data.Array(elemIndex, filter)
 import Data.JSON(decode)
 import qualified Data.Map as M
+import qualified Dispatcher as Dispatcher
 
 theForm :: [ColumnDetails] -> URLS -> {} -> React.UI
 theForm columns urls = mkUI spec {
