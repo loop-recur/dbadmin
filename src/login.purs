@@ -26,7 +26,7 @@ makeForm _ = form [
           onSubmit login
         ] [input [className "btn btn-primary pull-right", typeProp "Submit", value "Login", readOnly "true"] [], (makeInput "password" "password"), (makeInput "username" "text")]
 
-makeLink _ = a [onClick logout, href "#"] [text "Logout"]
+makeLink _ = a [className "btn btn-danger pull-right logout", onClick logout, href "#"] [text "Logout"]
 
 widget = mkUI spec {
     getInitialState = return {logged_in: false},
