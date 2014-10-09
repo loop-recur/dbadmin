@@ -59,7 +59,7 @@ theList baseUrl = mkUI spec {
     (Tuple name rows) <- readState
     return $ table [
         className "list table table-bordered table-striped"
-      ] rows
+      ] [tbody' $ rows]
 
 
 widget baseUrl = theList baseUrl {}
