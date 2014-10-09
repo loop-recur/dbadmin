@@ -5,24 +5,29 @@ import Helper
 import Types
 import React
 import React.DOM
+import Debug.Trace
 import Data.Maybe
 import Data.JSON(decode)
 import qualified Data.Map as M
+import Dispatcher
 
 theUl :: [React.UI] -> React.UI
 theUl = ul [ className "nav navbar-nav" ]
 
-getLink x = a [href "#"] [text x.name]
+sendNavEvent disp _ = do
+  trigger disp "navClick" "ox"
 
-renderListItem :: Table -> React.UI
-renderListItem (Table x) = li' [getLink x]
+getLink disp x = a [onClick (sendNavEvent disp), href ("#"++x.name)] [text x.name]
 
-createUl :: DB -> React.UI
-createUl = theUl <<< fmap renderListItem
+renderListItem :: Dispatch -> Table -> React.UI
+renderListItem disp (Table x) = li' [getLink disp x]
 
-createNav :: Maybe DB -> React.UI
-createNav = maybe (div' [text "Couldn't create nav"]) createUl
+createUl :: Dispatch -> DB -> React.UI
+createUl disp db = theUl <<< fmap (renderListItem disp) $ db
 
-widget baseUrl = (createNav <<< decode) <$> (http' urls.nav) 
+createNav :: Dispatch -> Maybe DB -> React.UI
+createNav disp mdb = maybe (div' [text "Couldn't create nav"]) (createUl disp) mdb
+
+widget baseUrl disp = ((createNav disp) <<< decode) <$> (http' urls.nav) 
   where
     urls = createUrls baseUrl ""

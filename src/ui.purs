@@ -20,8 +20,8 @@ custom config id' f = do
 list config id' = do
   runWidget id' $ L.widget config.host config.table
 
-form config id' = do
-  runWidget id' $ F.widget config.host config.table
+form config id' disp = do
+  renderToElementById id' $ F.widget config.host disp
 
 login id' = do
   renderToElementById id' $ Lg.widget {}
