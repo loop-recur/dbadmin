@@ -59,7 +59,7 @@ commentForm = mkUI spec do
 
 create urls e = do
   rs <- refsToObj <$> getRefs <* (preventDefault e)
-  runContT (save' urls.create rs) (\y-> return unit)
+  runContT (save' urls.create rs) (\y-> return unit <* trigger "created" unit <* clearFields)
 
 makeInput :: String -> React.UI
 makeInput x = input [className "form-control", typeProp "text", placeholder x, name x, ref x] []
@@ -78,3 +78,5 @@ getComponent (ColumnDetails cd) = getCorrectComponent cd.name
 
 widget baseUrl = theForm baseUrl {}
 
+foreign import clearFields
+  "function clearFields(){ $('form').find(':input').map(function(){ if(this.type !='submit') $(this).val(''); }); }" :: forall eff. Eff(eff) Unit

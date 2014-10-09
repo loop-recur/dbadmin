@@ -14,7 +14,7 @@ theUl :: [React.UI] -> React.UI
 theUl = ul [ className "nav navbar-nav" ]
 
 clickIt e = do
-  trigger "navClick" "speakers"
+  trigger "navClick"<<<innerHtml<<<getTarget $ e
   return unit
 
 getLink x = mkUI spec do
@@ -32,3 +32,13 @@ createNav = maybe (div' [text "Couldn't create nav"]) createUl
 widget baseUrl = (createNav <<< decode) <$> (http' urls.nav) 
   where
     urls = createUrls baseUrl ""
+
+foreign import getTarget
+  "function getTarget(e){ \
+  \  return e.target; \
+  \}" :: MouseEvent -> {}
+
+foreign import innerHtml
+  "function innerHtml(x){ \
+  \  return x.innerHTML; \
+  \}" :: {} -> String
