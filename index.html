@@ -5,8 +5,34 @@
     <link rel="stylesheet" href="css/main.css">
   </head>
   <body>
-    <script src="bower_components/react/react.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/react/react.js"></script>
+    <script>
+      var Dispatcher = function(state){
+        state = state || {};
+        var reg = {};
+
+        var init = function(x, y) {
+          if(!state.hasOwnProperty(x)) {
+            state[x] = y;
+          }
+        };
+
+        var register = function(name, f) {
+          if(reg[name]) {
+            reg[name].push(f);
+          } else { 
+            reg[name] = [f];
+          }
+        };
+
+        var trigger = function(name, data) {
+          var fs = reg[name] || [];
+          fs.map(function(f) { f(data); });
+        };
+        return {init:init, register:register, trigger:trigger}
+      }
+    </script>
 
     <div id="container">
       <div id="login" class=""></div>
