@@ -8,15 +8,20 @@ import React.DOM
 import Data.Maybe
 import Data.JSON(decode)
 import qualified Data.Map as M
-import qualified Dispatcher as Dispatcher
+import Dispatcher
 
 theUl :: [React.UI] -> React.UI
 theUl = ul [ className "nav navbar-nav" ]
 
-getLink x = a [onClick (Dispatcher.trigger x.name), href "#"] [text x.name]
+clickIt e = do
+  trigger "navClick" "speakers"
+  return unit
+
+getLink x = mkUI spec do
+  return $ a [onClick clickIt, href "#"] [text x.name]
 
 renderListItem :: Table -> React.UI
-renderListItem (Table x) = li' [getLink x]
+renderListItem (Table x) = li' [getLink x {}]
 
 createUl :: DB -> React.UI
 createUl = theUl <<< fmap renderListItem

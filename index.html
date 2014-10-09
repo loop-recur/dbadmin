@@ -8,15 +8,8 @@
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/react/react.js"></script>
     <script>
-      window.Dispatcher = function(state){
-        state = state || {};
+      window.Dispatcher = (function(){
         var reg = {};
-
-        var init = function(x, y) {
-          if(!state.hasOwnProperty(x)) {
-            state[x] = y;
-          }
-        };
 
         var register = function(name, f) {
           if(reg[name]) {
@@ -28,10 +21,10 @@
 
         var trigger = function(name, data) {
           var fs = reg[name] || [];
-          fs.map(function(f) { f(data); });
+          fs.map(function(f) { f(data)(); });
         };
-        return {init:init, register:register, trigger:trigger}
-      }
+        return {register:register, trigger:trigger}
+      })();
     </script>
 
     <div id="container">

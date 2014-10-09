@@ -21,7 +21,7 @@ list config id' = do
   runWidget id' $ L.widget config.host config.table
 
 form config id' = do
-  runWidget id' $ F.widget config.host config.table
+  renderToElementById id' $ F.widget config.host
 
 login id' = do
   renderToElementById id' $ Lg.widget {}
