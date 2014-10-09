@@ -18,5 +18,21 @@
     </div>
 
     <script src="js/app.js"></script>
+    <script>
+      $(function() {
+        var i = setInterval(function() {
+          var $el = $('nav li').first();
+          if($el) {
+            $el.addClass('active');
+
+            $('nav a').on('click', function(){
+              $('nav').find('.active').removeClass('active');
+              $(this).parent().addClass('active');
+            });
+            clearInterval(i);
+          }
+        }, 10);
+      });
+    </script>
   </body>
 </html>
