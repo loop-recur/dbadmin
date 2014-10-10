@@ -64,8 +64,11 @@ create urls e = do
 makeInput :: String -> React.UI
 makeInput x = input [className "form-control", typeProp "text", placeholder x, name x, ref x] []
 
+makeTimeInput :: String -> React.UI
+makeTimeInput x = input [className "form-control", typeProp "time", placeholder x, name x, ref x] []
+
 makeText :: String -> React.UI
-makeText x = textarea [placeholder x, name x, ref x] []
+makeText x = textarea [className "form-control", placeholder x, name x, ref x] []
 
 getComponent :: ColumnDetails -> React.UI
 getComponent (ColumnDetails cd) = getCorrectComponent cd.name 
@@ -73,6 +76,7 @@ getComponent (ColumnDetails cd) = getCorrectComponent cd.name
     getCorrectComponent = case cd.kind of
       "character varying" -> makeInput
       "text" -> makeText
+      "time without time zone" -> makeTimeInput
       _ -> makeInput
 
 

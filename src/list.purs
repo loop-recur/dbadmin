@@ -12,7 +12,6 @@ import Control.Monad.Cont.Trans(runContT)
 import qualified Data.Map as M
 import Dispatcher
 
-
 renderListHead:: Row -> React.UI
 renderListHead (Row x) = tr' ((th' <<< pure <<< text) <$> M.keys x)
 
