@@ -1,6 +1,6 @@
 module Main where
 
-import UI(form, list, login, nav)
+import Ui(form, list, login, nav)
 import Debug.Trace
 import Control.Monad.Eff
 
