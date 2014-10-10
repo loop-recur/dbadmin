@@ -24,7 +24,7 @@ input {
   float: right;
   margin: 0 0 20px 0; 
 }
-#login div.pull-right { padding-right: 5px; }
+#login div.pull-left { padding-right: 5px; }
 .clear { clear: both; }
 .col-xs-12 { padding: 0; }
 .logout { margin-top: 20px; }
