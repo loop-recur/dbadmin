@@ -11,7 +11,15 @@ var compile = function(options) {
         // We need this hack for now until gulp does something about
         // https://github.com/gulpjs/gulp/issues/71
         //var psc = purescript.psc();
-        var psc = purescript.psc({main: true, output: 'app.js'});
+        var psc = purescript.psc({
+          main: "Main",
+          output: 'app.js',
+          modules: ['Ajax', 'Api', 'Custom',
+                  'Dispatcher', 'Form', 'Helper',
+                  'List', 'Login', 'Main', 'Nav',
+                  'Types', 'Ui'
+                  ]
+        });
         psc.on('error', function(e) {
             console.error(e.message);
             psc.end();

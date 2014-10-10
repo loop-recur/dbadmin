@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-
   "use strict";
 
   grunt.initConfig({
@@ -11,10 +10,16 @@ module.exports = function(grunt) {
 
     psc: {
       options: {
-        modules: ["src/app"]
+        main: "Main",
+        modules: ['Ajax', 'Api', 'Custom',
+                  'Dispatcher', 'Form', 'Helper',
+                  'List', 'Login', 'Main', 'Nav',
+                  'Types', 'Ui'
+                  ]
+        //modules: ["src/app"]
       },
       all: {
-	src: ["<%=srcFiles%>"],
+	    src: ["<%=srcFiles%>"],
         dest: "js/app.js"
       }
     },
