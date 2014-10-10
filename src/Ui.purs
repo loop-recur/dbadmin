@@ -1,4 +1,4 @@
-module UI where
+module Ui where
 
 import React(renderToElementById)
 import qualified Form as F
