@@ -10,12 +10,12 @@ var psc = function() {
       // We need this hack for now until gulp does something about
       // https://github.com/gulpjs/gulp/issues/71
       var psc = purescript.psc({
-            main: "Main",
-            output: 'app.js',
+            main: false,
+            output: 'widgets.js',
             modules: ['Ajax', 'Api', 'Custom',
                       'Dispatcher', 'Form', 'Helper',
                       'List', 'Login', 'Main', 'Nav',
-                      'Types', 'Ui'
+                      'Types', 'UI'
                      ]
           });
 

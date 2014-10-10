@@ -31,7 +31,7 @@ unpackedJValueMap = M.fromList <<< fmap fixValues <<< M.toList
 
 foreign import rawUI
   "function rawUI(str) { \
-  \ return window.React.DOM.div({dangerouslySetInnerHTML: {__html: str}}); \
+  \ return window.React.DOM.span({dangerouslySetInnerHTML: {__html: str}}); \
   \ }" :: String -> React.UI
 
 

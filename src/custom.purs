@@ -13,18 +13,12 @@ import Control.Apply((<*))
 import qualified Data.Map as M
 import Data.JSON
 
-theCustom :: [React.UI] -> {} -> React.UI
-theCustom subviews = mkUI spec do
-  return $ div [
-      className "custom"
-    ] subviews
 
-
-createCustom :: forall a. ({|a} -> String) -> Maybe [Row] -> React.UI
-createCustom f mr = maybe (div' [text "Couldn't create custom"]) (renderComponents f) mr
+createCustom :: forall a. ([{|a}] -> String) -> Maybe [Row] -> React.UI
+createCustom f = maybe (div' [text "Couldn't create custom"]) html
   where
-    renderComponents f xs = theCustom ((go f) <$> xs) {}
-    go f (Row x) = rawUI<<<f $ toRecord $ M.toList $ unpackedJValueMap x
+    html = rawUI <<< f <<< (fmap toJsRec)
+    toJsRec (Row x) = toRecord <<< M.toList <<< unpackedJValueMap $ x
 
 widget baseUrl tablename f = ((createCustom f) <<< decode) <$> (http' urls.index) 
   where
