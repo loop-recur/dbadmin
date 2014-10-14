@@ -1,4 +1,9 @@
-module Api where
+module Api(
+    http
+  , http'
+  , blankUrls
+  , createUrls
+  ) where
 
 import Ajax
 import Types
@@ -12,71 +17,57 @@ import Data.Traversable
 import Data.Tuple
 import Data.JSON
 import qualified Data.Map as M
-
-newtype ColumnDetails = ColumnDetails { name::String, kind::String, maxLen:: Maybe Number, nullable::Boolean, position:: Number, updatable:: Boolean, schema:: String, precision:: Maybe Number }
-
-newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
-
-newtype Table = Table {schema :: String, name :: String, insertable :: Boolean}
-type DB = [Table]
-
-data Row = Row (M.Map String JValue)
+import Network.HTTP
 
 schema :: [String] -> [ColumnDetails] -> Schema
 schema pkey columns = Schema {pkey:pkey, columns:columns}
+
+table :: String -> String -> Boolean -> Table
+table schma name insertable = Table {schema:schma, name:name, insertable: insertable}
 
 columnDetails :: String -> String -> Maybe Number -> Boolean -> Number -> Boolean -> String -> Maybe Number -> ColumnDetails
 columnDetails name kind maxLen nullable position updatable schma precision = ColumnDetails {name:name, kind:kind, maxLen:maxLen, nullable:nullable, position: position, updatable: updatable, schema: schma, precision: precision}
 
 instance tableFromJSON :: FromJSON Table where
-  parseJSON (Data.JSON.JObject o) = do
-    schema <- (o .: "schema")
-    name <- (o .: "name")
-    insertable <- (o .: "insertable")
-    Right $ Table {schema: schema, name: name, insertable: insertable}
+  parseJSON (Data.JSON.JObject o) = table <$> (o .: "schema") <*> (o .: "name") <*> (o .: "insertable")
   parseJSON x = Left "not a db"
 
 instance schemaFromJSON :: FromJSON Schema where
-  parseJSON (Data.JSON.JObject o) = do
-    pkey <- (o .: "pkey")
-    columns <- (o .: "columns")
-    Right $ schema pkey columns
+  parseJSON (Data.JSON.JObject o) = schema <$> (o .: "pkey") <*> (o .: "columns")
   parseJSON x = Left "this ain't no schema"
 
 instance columnDetailsFromJSON :: FromJSON ColumnDetails where
-  parseJSON (Data.JSON.JObject o) = do
-    name <- (o .: "name")
-    kind <- (o .: "type")
-    maxLen <- (o .:? "maxLen")
-    nullable <- (o .: "nullable")
-    position <- (o .: "position")
-    updatable <- (o .: "updatable")
-    schma <- (o .: "schema")
-    precision <- (o .:? "precision")
-    Right $ columnDetails name kind maxLen nullable position updatable schma precision
+  parseJSON (Data.JSON.JObject o) = columnDetails <$> (o .: "name") <*>
+                                                    (o .: "type") <*>
+                                                    (o .:? "maxLen") <*>
+                                                    (o .: "nullable") <*>
+                                                    (o .: "position") <*>
+                                                    (o .: "updatable") <*>
+                                                    (o .: "schema") <*>
+                                                    (o .:? "precision")
   parseJSON x = Left "not a column"
 
 instance rowFromJSON :: FromJSON Row where
-    parseJSON (JObject o) = (Row <<< M.fromList) <$> (sequence $ fn <$> M.toList o)
-      where
-        fn t =  Right t
+    parseJSON (JObject o) = (Row <<< M.fromList) <$> (sequence $ Right <$> M.toList o)
     parseJSON x = Left "Uncaught js value"
 
-http :: forall r. String -> String -> ContT Unit (EffJqAjax r) String
-http method url = ContT $ \res -> jqAjax {method: method, url:url} res
+http :: forall r. HTTPAction -> StringifiedJSON -> ContT Unit (EffJqAjax r) String
+http (Tuple method url) body = ContT $ \res -> jqAjax {method: method, url:url, body: body, contentType: "application/json", processData: false} res
 
-http' :: forall r. Tuple String String -> ContT Unit (EffJqAjax r) String
-http' (Tuple method url) = http method url
-
--- TODO make this just http'
-save' (Tuple method url) body = ContT $ \res -> jqAjax {method: method, url:url, body: body, contentType: "application/json", processData: false} res
+http' :: forall r. HTTPAction -> ContT Unit (EffJqAjax r) String
+http' t = http t ""
 
 blankUrls :: URLS
-blankUrls = {create: (Tuple "" ""), schema: (Tuple "" ""), index: (Tuple "" ""), nav: (Tuple "" ""), destroy: (Tuple "DELETE" ""), update: (Tuple "PATCH" "")}
+blankUrls = createUrls "" ""
 
--- Let's get READER up in here.
 createUrls :: String -> String -> URLS
-createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url), nav: (Tuple "GET" baseurl), destroy: (Tuple "DELETE" idUrl), update: (Tuple "PATCH" idUrl)}
+createUrls baseurl tablename = { schema: (Tuple OPTIONS url)
+                               , index: (Tuple GET url)
+                               , create:  (Tuple POST url)
+                               , nav: (Tuple GET baseurl)
+                               , destroy: (Tuple DELETE idUrl)
+                               , update: (Tuple PATCH idUrl)
+                               }
   where
     idUrl = url++"?id=eq:{id}"
     url = baseurl++tablename

@@ -19,7 +19,7 @@ enter_key = 13
 
 --saveForReal :: forall c d. URLS -> Eff (state :: ReactState (write :: WriteAllowed, read :: ReadAllowed | c) (Tuple Row { editing :: Boolean, key :: String, val :: JValue }), jqajax :: JqAjax | d) Unit
 saveForReal self st row urls = do
-  runContT (save' (endpoint urls.update row) (refsToObj' st)) \_ -> do
+  runContT (http (endpoint urls.update row) (refsToObj' st)) \_ -> do
     return $ runUI self $ do
       writeState (Tuple row {editing: false, val: st.val, key:st.key})
     return unit

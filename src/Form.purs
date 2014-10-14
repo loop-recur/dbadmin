@@ -59,7 +59,7 @@ commentForm = mkUI spec do
 
 create urls e = do
   rs <- refsToObj <$> getRefs <* (preventDefault e)
-  runContT (save' urls.create rs) (\y-> return unit <* trigger "created" unit <* clearFields)
+  runContT (http urls.create rs) (\y-> return unit <* trigger "created" unit <* clearFields)
 
 makeInput :: String -> React.UI
 makeInput x = input [className "form-control", typeProp "text", placeholder x, name x, ref x] []
