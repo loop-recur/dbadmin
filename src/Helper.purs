@@ -55,5 +55,28 @@ foreign import preventDefault
 foreign import refsToObj
   "function refsToObj(xs) { \
   \   return JSON.stringify(Object.keys(xs).reduce(function(acc, x){ acc[x] = xs[x].state.value; return acc;}, {})); \
-  \}" :: {} -> StringifiedJSON
+    \}" :: {} -> StringifiedJSON
 
+--this should be done in ps
+foreign import refsToObj'
+  "function refsToObj$prime(xs) { \
+  \  console.log(xs); \
+  \  var rec = {}; \
+  \  rec[xs.key] = xs.val; \
+  \  return JSON.stringify(rec); \
+  \ }" :: forall r. r -> StringifiedJSON
+
+foreign import getTarget
+  "function getTarget(e){ \
+  \  return e.target; \
+  \}" :: MouseEvent -> {}
+
+foreign import getTarget'
+  "function getTarget$prime(e){ \
+  \  return e.target; \
+  \}" :: forall a. Event -> a
+
+foreign import innerHtml
+  "function innerHtml(x){ \
+  \  return x.innerHTML; \
+  \}" :: {} -> String

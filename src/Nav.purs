@@ -32,13 +32,3 @@ createNav = maybe (div' [text "Couldn't create nav"]) createUl
 widget baseUrl = (createNav <<< decode) <$> (http' urls.nav) 
   where
     urls = createUrls baseUrl ""
-
-foreign import getTarget
-  "function getTarget(e){ \
-  \  return e.target; \
-  \}" :: MouseEvent -> {}
-
-foreign import innerHtml
-  "function innerHtml(x){ \
-  \  return x.innerHTML; \
-  \}" :: {} -> String

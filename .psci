@@ -25,6 +25,7 @@
 :m bower_components/purescript-react/src/React/DOM.purs
 :m bower_components/purescript-strings/src/Data/String.purs
 :m bower_components/purescript-tuples/src/Data/Tuple.purs
+:m bower_components/purescript-xhr/src/Network/XHR.purs
 :m bower_components/purescript-arrays/src/Data/Array/Unsafe.purs
 :m bower_components/purescript-foreign/src/Data/Foreign/Class.purs
 :m bower_components/purescript-foreign/src/Data/Foreign/Index.purs
@@ -49,6 +50,9 @@
 :m bower_components/purescript-transformers/src/Control/Monad/State.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Trans.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Writer.purs
+:m bower_components/purescript-xhr/src/Network/XHR/Internal.purs
+:m bower_components/purescript-xhr/src/Network/XHR/Types.purs
+:m bower_components/purescript-refs/src/Control/Monad/Eff/Ref.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Cont/Class.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Cont/Trans.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Error/Class.purs
@@ -62,6 +66,7 @@
 :m bower_components/purescript-transformers/src/Control/Monad/State/Trans.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Writer/Class.purs
 :m bower_components/purescript-transformers/src/Control/Monad/Writer/Trans.purs
+:m bower_components/purescript-refs/src/Control/Monad/Eff/Ref/Unsafe.purs
 :m src/Ajax.purs
 :m src/Api.purs
 :m src/Custom.purs
@@ -69,8 +74,8 @@
 :m src/Form.purs
 :m src/Helper.purs
 :m src/List.purs
-:m src/Login.purs
 :m src/Main.purs
 :m src/Nav.purs
 :m src/Types.purs
 :m src/Ui.purs
+:m src/login.purs

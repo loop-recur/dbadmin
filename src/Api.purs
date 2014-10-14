@@ -69,10 +69,14 @@ http' :: forall r. Tuple String String -> ContT Unit (EffJqAjax r) String
 http' (Tuple method url) = http method url
 
 -- TODO make this just http'
-save' (Tuple method url) body = ContT $ \res -> jqAjax {method: "POST", url:url, body: body, contentType: "application/json", processData: false} res
+save' (Tuple method url) body = ContT $ \res -> jqAjax {method: method, url:url, body: body, contentType: "application/json", processData: false} res
+
+blankUrls :: URLS
+blankUrls = {create: (Tuple "" ""), schema: (Tuple "" ""), index: (Tuple "" ""), nav: (Tuple "" ""), destroy: (Tuple "DELETE" ""), update: (Tuple "PATCH" "")}
 
 -- Let's get READER up in here.
 createUrls :: String -> String -> URLS
-createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url), nav: (Tuple "GET" baseurl)}
+createUrls baseurl tablename = {schema: (Tuple "OPTIONS" url), index: (Tuple "GET" url), create:  (Tuple "POST" url), nav: (Tuple "GET" baseurl), destroy: (Tuple "DELETE" idUrl), update: (Tuple "PATCH" idUrl)}
   where
+    idUrl = url++"?id=eq:{id}"
     url = baseurl++tablename
