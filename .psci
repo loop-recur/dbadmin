@@ -15,6 +15,7 @@
 :m bower_components/purescript-foldable-traversable/src/Data/Foldable.purs
 :m bower_components/purescript-foldable-traversable/src/Data/Traversable.purs
 :m bower_components/purescript-foreign/src/Data/Foreign.purs
+:m bower_components/purescript-http/src/Network/HTTP.purs
 :m bower_components/purescript-json/src/Data/JSON.purs
 :m bower_components/purescript-maps/src/Data/Graph.purs
 :m bower_components/purescript-maps/src/Data/Map.purs

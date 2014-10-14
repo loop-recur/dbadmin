@@ -52,7 +52,7 @@ instance rowFromJSON :: FromJSON Row where
     parseJSON x = Left "Uncaught js value"
 
 http :: forall r. HTTPAction -> StringifiedJSON -> ContT Unit (EffJqAjax r) String
-http (Tuple method url) body = ContT $ \res -> jqAjax {method: method, url:url, body: body, contentType: "application/json", processData: false} res
+http (Tuple method url) body = ContT $ \res -> jqAjax {method: (show method), url:url, body: body, contentType: "application/json", processData: false} res
 
 http' :: forall r. HTTPAction -> ContT Unit (EffJqAjax r) String
 http' t = http t ""
