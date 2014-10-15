@@ -16,8 +16,10 @@ newtype ColumnDetails = ColumnDetails { name::String, kind::String, maxLen:: May
 
 newtype Schema = Schema {pkey :: [String], columns :: [ColumnDetails]}
 
-newtype Table = Table {schema :: String, name :: String, insertable :: Boolean}
+type TableDesc = {schema :: String, name :: String, insertable :: Boolean}
+newtype Table = Table TableDesc
 type DB = [Table]
 
-data Row = Row (M.Map String JValue)
+type RowDesc = (M.Map String JValue)
+data Row = Row RowDesc
 
